@@ -155,10 +155,17 @@ void loop()
       response += "<body>\n";
     
       response += "<h1>Attendance History</h1>";
-      response += "<p>Student Name: <span id=\"StudentName\"></span>" + String(NAME) + " | ";
-      response += "Student Roll No: <span id=\"StudentId\"></span>" + String(ID) + " | ";
-      response += "Time: <span id=\"show_time\"></span></p>";
-      response += "<script>document.getElementById(\"show_time\").innerHTML=new Date().toLocaleTimeString();</script>";
+      response += "<table border=\"1\">";
+      response += "<thead><tr><th>Name</th><th>Roll</th><th>Time</th></tr></thead>";
+      response += "<tbody><tr>";
+      response += "<td id=\"StudentName\"></td>";
+      response += "<td id=\"StudentRollNo\"></td>";
+      response += "<td id=\"show_time\"></td>";
+      response += "</tr></tbody></table>";
+      response += "<script>document.getElementById(\"StudentName\").innerHTML = '" + String(NAME) + "';</script>";
+      response += "<script>document.getElementById(\"StudentRollNo\").innerHTML = '" + String(ID) + "';</script>";
+      response += "<script>document.getElementById(\"show_time\").innerHTML = new Date().toLocaleTimeString();</script>";
+      response += "</body></html>";
 
 
       response += "</body></html>";
