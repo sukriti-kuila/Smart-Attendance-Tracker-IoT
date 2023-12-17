@@ -2,12 +2,13 @@
 #include <HardwareSerial.h>
 #include <WiFi.h>
 #include <Wire.h>  
+// Download the library --> https://github.com/fdebrabander/Arduino-LiquidCrystal-I2C-library
 #include <LiquidCrystal_I2C.h> //SDA -> GP4 and SCL -> GP5
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 Adafruit_Fingerprint finger = Adafruit_Fingerprint(&Serial1);
 
-const char* ssid = "M2 Pro (Poco)";      
-const char* password = "PASSWORD";
+const char* ssid = "SOA UNIVERSITY";      
+const char* password = "password";
 
 const char* NAME;
 const char* ID;
@@ -22,7 +23,7 @@ void setup()
   lcd.setCursor(0, 0);
   lcd.print("  ATTENDANCE ");
   lcd.setCursor(0, 1);
-  lcd.print("   SYSTEM");
+  lcd.print("    SYSTEM");
   Serial.begin(9600);
   while (!Serial);  
   delay(100);
@@ -141,24 +142,33 @@ void loop()
   finger.fingerID = 0;
   WiFiClient client = server.available();
   if (client) {
-    Serial.println("New client connected");
-    String response = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n";
-    response += "<!DOCTYPE html><html><body>";
-    response += "<head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0, user-scalable=no\">\n";
-    response += "<style>html { font-family: Helvetica; display: inline-block; margin: 0px auto; text-align: center;}\n";
-    response += "body{margin-top: 50px;} h1 {color: #444444;margin: 50px auto 30px;}\n";
-    response += "p {font-size: 24px;color: #444444;margin-bottom: 10px;}\n";
-    response += "</style>\n";
-    response += "</head>\n";
-    response += "<body>\n";
-    response += "<h1>Raspberry Pi Pico W Attendance System</h1>";
-    response += "<p>Student Name: <span id=\"Student Name\"></span>" + String(NAME) + "</p>";
-    response += "<p>Student Id: <span id=\"Student Id\"></span> " + String(ID) + "</p>";
-    response += "</body></html>";
-    client.print(response);
-    delay(10);
-    client.stop();
-    Serial.println("Client disconnected");
+      Serial.println("New client connected");
+  
+      String response = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n";
+      response += "<!DOCTYPE html><html><body>";
+      response += "<head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0, user-scalable=no\">\n";
+      response += "<style>html { font-family: Helvetica; display: inline-block; margin: 0px auto; text-align: center;}\n";
+      response += "body{margin-top: 50px;} h1 {color: #444444;margin: 50px auto 30px;}\n";
+      response += "p {font-size: 24px;color: #444444;margin-bottom: 10px;}\n";
+      response += "</style>\n";
+      response += "</head>\n";
+      response += "<body>\n";
+    
+      response += "<h1>Attendance History</h1>";
+      response += "<p>Student Name: <span id=\"StudentName\"></span>" + String(NAME) + " | ";
+      response += "Student Roll No: <span id=\"StudentId\"></span>" + String(ID) + " | ";
+      response += "Time: <span id=\"show_time\"></span></p>";
+      response += "<script>document.getElementById(\"show_time\").innerHTML=new Date().toLocaleTimeString();</script>";
+
+
+      response += "</body></html>";
+
+
+      Serial.println(response);
+  
+      client.print(response);
+      client.stop();
+      Serial.println("Client disconnected");
   }
 }
 
@@ -257,4 +267,3 @@ int getFingerprintIDez() {
   Serial.print(" with confidence of "); Serial.println(finger.confidence);
   return finger.fingerID;
 }
-
