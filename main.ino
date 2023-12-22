@@ -2,20 +2,20 @@
 #include <HardwareSerial.h>
 #include <WiFi.h>
 #include <Wire.h>  
-// Download the library --> https://github.com/fdebrabander/Arduino-LiquidCrystal-I2C-library
 #include <LiquidCrystal_I2C.h> //SDA -> GP4 and SCL -> GP5
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 Adafruit_Fingerprint finger = Adafruit_Fingerprint(&Serial1);
 
-const char* ssid = "SOA UNIVERSITY";      
-const char* password = "password";
+const char* ssid = "M2 Pro (Poco)";      
+const char* password = "pqrstuv123";
 
 const char* NAME;
 const char* ID;
-
+char* val;
 WiFiServer server(80);
 void setup()
 {
+  val = "0";
   pinMode(12,OUTPUT);
   pinMode(14,OUTPUT);
   lcd.begin();    
@@ -42,8 +42,16 @@ void setup()
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED)
   { delay(1000);
+    lcd.setCursor(0, 0);
+    lcd.print("  Connecting to ");
+    lcd.setCursor(0, 1);
+    lcd.print("    WiFi    ");
     Serial.println("Connecting to WiFi...");
   }
+  lcd.setCursor(0, 0);
+  lcd.print("  Connected to ");
+  lcd.setCursor(0, 1);
+  lcd.print("    WiFi    ");
   Serial.println("Connected to WiFi");
   Serial.println(WiFi.localIP());
   Serial.println(F("Reading sensor parameters"));
@@ -71,21 +79,22 @@ void setup()
 void loop()                     
 {
   lcd.setCursor(0, 0);
-  lcd.print("No Finger !!");
+  lcd.print("  PLACE FINGER");
   getFingerprintID();
-  delay(50);            
+  delay(50);           
   if (finger.fingerID == 1) {
     Serial.print("!!--");
     Serial.println(finger.fingerID);
-    NAME = "Student a         ";
+    NAME = "STUDENT A         ";
     ID = "1";
     if (finger.confidence >= 60) {
+      val = "1";
       Serial.print("Attendace Marked for "); Serial.println(NAME);
       digitalWrite(12,HIGH);
       lcd.setCursor(0, 0);
-      lcd.print(NAME);
+      lcd.print("     WELCOME     ");
       lcd.setCursor(0, 1);
-      lcd.print(ID);
+      lcd.print(String("   ") + NAME);
       delay(3000);
       lcd.clear();
     }
@@ -93,33 +102,35 @@ void loop()
   if (finger.fingerID == 2) {
     Serial.print("!!--");
     Serial.println(finger.fingerID);
-    NAME = "Student b      ";
+    NAME = "STUDENT B      ";
     ID = "2";
+    
     if (finger.confidence >= 60) {
+      val = "1";
       Serial.print("Attendace Marked for "); Serial.println(NAME);
       digitalWrite(12,HIGH);
       lcd.setCursor(0, 0);
-      lcd.print(NAME);
+      lcd.print("     WELCOME     ");
       lcd.setCursor(0, 1);
-      lcd.print(ID);
+      lcd.print(String("   ") + NAME);
       delay(3000);
       lcd.clear();
-      // digital write - open the door
     }
 
   }
   if (finger.fingerID == 3) {
     Serial.print("!!--");
     Serial.println(finger.fingerID);
-    NAME = "Student c           ";
+    NAME = "STUDENT C           ";
     ID = "3               ";
     if (finger.confidence >= 60) {
+      val = "1";
       Serial.print("Attendace Marked for "); Serial.println(NAME);
       digitalWrite(12,HIGH);
       lcd.setCursor(0, 0);
-      lcd.print(NAME);
+      lcd.print("     WELCOME     ");
       lcd.setCursor(0, 1);
-      lcd.print(ID);
+      lcd.print(String("   ") + NAME);
       delay(3000);
       lcd.clear();
     }
@@ -128,54 +139,129 @@ void loop()
   if (finger.fingerID == 4) {
     Serial.print("!!--");
     Serial.println(finger.fingerID);
-    NAME = "Student d       ";
+    NAME = "STUDENT D       ";
     ID = "4                 ";
     if (finger.confidence >= 60) {
+       val = "1";
+       Serial.print("Attendace Marked for "); Serial.println(NAME);
+      digitalWrite(12,HIGH);
+      lcd.setCursor(0, 0);
+      lcd.print("     WELCOME     ");
+      lcd.setCursor(0, 1);
+      lcd.print(String("   ") + NAME);
+      delay(3000);
+      lcd.clear();
+    }
+  }
+
+  if (finger.fingerID == 5) {
+    Serial.print("!!--");
+    Serial.println(finger.fingerID);
+    NAME = "STUDENT E           ";
+    ID = "5               ";
+    if (finger.confidence >= 60) {
+      val = "1";
       Serial.print("Attendace Marked for "); Serial.println(NAME);
       digitalWrite(12,HIGH);
+      lcd.setCursor(0, 0);
+      lcd.print("     WELCOME     ");
+      lcd.setCursor(0, 1);
+      lcd.print(String("   ") + NAME);
+      delay(3000);
+      lcd.clear();
     }
   }
   else{
+    val = "0";
     digitalWrite(12,LOW);
     digitalWrite(14,LOW);
   }
   finger.fingerID = 0;
   WiFiClient client = server.available();
   if (client) {
-      Serial.println("New client connected");
-  
-      String response = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n";
-      response += "<!DOCTYPE html><html><body>";
-      response += "<head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0, user-scalable=no\">\n";
-      response += "<style>html { font-family: Helvetica; display: inline-block; margin: 0px auto; text-align: center;}\n";
-      response += "body{margin-top: 50px;} h1 {color: #444444;margin: 50px auto 30px;}\n";
-      response += "p {font-size: 24px;color: #444444;margin-bottom: 10px;}\n";
-      response += "</style>\n";
-      response += "</head>\n";
-      response += "<body>\n";
+    Serial.println("New client connected");
+
+        String response = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n";
+        response += "<!DOCTYPE html><html><body>";
+        response += "<head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0, user-scalable=no\">\n";
     
-      response += "<h1>Attendance History</h1>";
-      response += "<table border=\"1\">";
-      response += "<thead><tr><th>Name</th><th>Roll</th><th>Time</th></tr></thead>";
-      response += "<tbody><tr>";
-      response += "<td id=\"StudentName\"></td>";
-      response += "<td id=\"StudentRollNo\"></td>";
-      response += "<td id=\"show_time\"></td>";
-      response += "</tr></tbody></table>";
-      response += "<script>document.getElementById(\"StudentName\").innerHTML = '" + String(NAME) + "';</script>";
-      response += "<script>document.getElementById(\"StudentRollNo\").innerHTML = '" + String(ID) + "';</script>";
-      response += "<script>document.getElementById(\"show_time\").innerHTML = new Date().toLocaleTimeString();</script>";
-      response += "</body></html>";
+        // CSS 
+        response += "<style>";
+        response += "body { background-color: #323150; }";
+        response += ".title-header { color: #FFC60B; text-align: center; margin-left: 32px;";
+        response += "font-family: 'Trebuchet MS', sans-serif; }";
+        response += ".container { margin: 25px 50px 75px 400px; }";
+        response += ".content-table { border-collapse: collapse; margin: 25px 0; font-size: 0.9em;";
+        response += "min-width: 400px; border-radius: 5px 5px 0 0; overflow: hidden;";
+        response += "box-shadow: 0 5px 5px black; }";
+        response += ".content-table thead tr { background-color: #009879; color: #ffffff;";
+        response += "text-align: left; font-weight: bold; }";
+        response += ".content-table th, .content-table td { padding: 12px 15px; text-align: center;";
+        response += "font-family: 'Verdana'; }";
+        response += ".content-table tbody tr { border-bottom: 1px solid #dddddd; }";
+        response += ".content-table tbody tr:nth-of-type(even) { background-color: #f3f3f3; }";
+        response += ".content-table tbody tr:last-of-type { border-bottom: 2px solid #009879; }";
+        response += ".content-table tbody tr.active-row { font-weight: bold; color: #009879; }";
+        response += ".even-row { background-color: #F8F6FF; }";
+        response += "</style></head><body>";
 
+    
+        response += "</head>\n";
+        response += "<body>\n";
+        response += "<div class=\"title-header\">";
+        response += "<h1>Attendance History</h1>";
+        response += "</div>";
+        response += "<div class=\"container\">";
+        response += "<table class=\"content-table\">";
+        response += "<thead class=\"header-row\"><tr><th>Student Name</th><th>Roll Number</th><th>Time</th><th>Date</th></tr></thead>";
+        response += "<tbody id=\"studentTableBody\">";
+        response += "</tbody></table></div>";
 
-      response += "</body></html>";
+        //JavaScript
+        response += "<script>";
+        response += "var storedData = JSON.parse(localStorage.getItem('StudentData')) || [];";
+        
+        response += "var currentTime = new Date();";
+        response += "const options = { year: 'numeric', month: 'short', day: 'numeric' };";
+        response += "var date = currentTime.toLocaleDateString('en-IN', options);";
 
+//        response += "if (" + String(val) + " == 1 && " + String(finger.confidence) + " >= 60) {";
+        
+        response += "  var newStudent = { name: '" + String(NAME) + "', id: '" + String(ID) + "', time: new Date().toLocaleTimeString(), date: date };";
+        response += "  storedData.push(newStudent);";
+        response += "  localStorage.setItem('StudentData', JSON.stringify(storedData));";
+        
+//        response += "}";
+        
+        response += "var tableBody = document.getElementById('studentTableBody');";
+        response += "tableBody.innerHTML = '';";
+    
+        response += "storedData.forEach(function(student, index) {";
+        response += "var row = tableBody.insertRow();";
+        response += "var nameCell = row.insertCell(0);";
+        response += "var idCell = row.insertCell(1);";
+        response += "var timeCell = row.insertCell(2);";
+        response += "var dateCell = row.insertCell(3);";
+    
+        response += "nameCell.textContent = student.name;";
+        response += "idCell.textContent = student.id;";
+        response += "timeCell.textContent = student.time;";
+        response += "dateCell.textContent = student.date;";
+        response += "row.className = index % 2 === 0 ? 'even-row' : 'odd-row';";
+        
+        response += "val = '0';"; 
+        response += "});";
+        
+        response += "</script>";
+        response += "</body></html>";
+        
 
-      Serial.println(response);
-  
-      client.print(response);
-      client.stop();
-      Serial.println("Client disconnected");
+        Serial.println(String(ID));
+        Serial.println(finger.confidence);
+    
+        client.print(response);
+        client.stop();
+        Serial.println("Client disconnected");
   }
 }
 
@@ -240,9 +326,9 @@ uint8_t getFingerprintID() {
     Serial.println("Did not find a match");
     digitalWrite(14,HIGH);
     lcd.setCursor(0, 0);
-    lcd.print("Did not find");
+    lcd.print("AUTHENTICATION");
     lcd.setCursor(0, 1);
-    lcd.print("Finger");
+    lcd.print("    FAILED");
     delay(3000);
     lcd.clear();
     return p;
